@@ -1,3 +1,7 @@
+
+#ifndef TADS
+#define TADS
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -6,7 +10,7 @@
 // Struct para mensagens.
 typedef struct {
     short int Prioridade; // Nível de prioridade da mensagem.
-    char *Msg; // String que contém a mensagem.
+    char Msg[1000]; // String que contém a mensagem.
 } Mensagem;
 
 // Define um "Apontador" como sendo um ponteiro para uma célula.
@@ -27,34 +31,12 @@ typedef struct {
 // Operações sobre a Lista:
 
 // Cria caixa de entrada vazia:
-void CriaCaixaVazia(CaixaDeEntrada *Caixa) {
-    Caixa->primeiro = (Apontador_email)malloc(sizeof(Celula_email));
-    Caixa->ultimo = Caixa->primeiro;
-    Caixa->primeiro->Prox = NULL;
-}
-
+void CriaCaixaVazia(CaixaDeEntrada *Caixa, int id);
 // Verifica se a caixa esta ou não vazia
-int CaixaVazia(CaixaDeEntrada *Caixa) {
-    return (Caixa->primeiro == Caixa->ultimo);
-}
+int CaixaVazia(CaixaDeEntrada *Caixa);
 
 // Função que entrega email a uma caixa de entrada.
-void EntregaEmail(CaixaDeEntrada *Caixa, Mensagem msg) {
-    Apontador_email aux1, aux2;
-    aux1 = Caixa->primeiro;
-    while (aux1->Prox->Item.Prioridade >= msg.Prioridade &&
-            aux1->Prox != NULL) {
-        aux1 = aux1->Prox;
-    }
-    aux2 = aux1->Prox;
-    aux1->Prox = (Apontador_email)malloc(sizeof(Celula_email));
-    aux1->Prox->Prox = aux2;
-    aux1->Prox->Item = msg;   
-    if(aux2 == NULL){
-        Caixa->ultimo = aux1->Prox;
-    }     
-}
-
+void EntregaEmail(CaixaDeEntrada *Caixa, Mensagem msg);
 
 /*
 Função que consulta caixa de entrada. 
@@ -63,16 +45,7 @@ contrário, imprime a primeira mensagem da caixa de entrada seguindo a ordem
 de prioridade e em seguida apaga ela para que a próxima consulta realizada a 
 caixa de entrada imprima a próxima mensagem.
 */
-void ConsultaEmail(CaixaDeEntrada *Caixa){
-    if(CaixaVazia(Caixa)){
-        printf("CAIXA DE ENTRADA VAZIA\n");
-    }else{
-        printf("%s\n", Caixa->primeiro->Prox->Item.Msg);
-        Apontador_email aux = Caixa->primeiro->Prox;
-        Caixa->primeiro->Prox = Caixa->primeiro->Prox->Prox;
-        free(aux);
-    }
-}
+void ConsultaEmail(CaixaDeEntrada *Caixa);
 
 
 // Lista encadeada simples com descritor para caixas de entrada
@@ -92,10 +65,18 @@ typedef struct {
 // Operações sobre a lista
 
 // Inicializa servidor
-void CriaServer(Server *Sv) {
-    Sv->primeiro = (Apontador_caixa)malloc(sizeof(Celula_caixa));
-    Sv->ultimo = Sv->primeiro;
-    Sv->primeiro->Prox = NULL;
-}
+void CriaServer(Server *sv);
+
+// Direciona email para caixa certa
+void EntregaMensagem(Server *sv, Mensagem msg, int id);
 
 
+void NovaCaixa(Server *sv, int id);
+
+
+void ConsultaID(Server *sv, int id);
+
+
+
+
+#endif
