@@ -2,51 +2,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// // Lista encadeada simples com descritor para emails
-
-// // Struct para mensagens.
-// typedef struct {
-//     short int Prioridade; // Nível de prioridade da mensagem.
-//     char Msg[1000]; // String que contém a mensagem.
-// } Mensagem;
-
-// // Define um "Apontador" como sendo um ponteiro para uma célula.
-// typedef struct Celula_email_str *Apontador_email;
-
-// // Struct para célula. Contém uma mensagem e um Apontador_email para a próxima célula.
-// typedef struct Celula_email_str {
-//     Mensagem Item;
-//     Apontador_email Prox;
-// } Celula_email;
-
-// // Descritor:
-// typedef struct {
-//     int Id;
-//     Apontador_email primeiro, ultimo;
-// } CaixaDeEntrada;
-
-// Operações sobre a Lista:
+// ##########################################################################################
+//                            Operações sobre caixa de entrada
+// ##########################################################################################
 
 // Cria caixa de entrada vazia:
-void CriaCaixaVazia(CaixaDeEntrada *Caixa, int id) {
-    Caixa->primeiro = (Apontador_email)malloc(sizeof(Celula_email));
-    Caixa->ultimo = Caixa->primeiro;
-    Caixa->primeiro->Prox = NULL;
-    Caixa->Id = id;
+void CriaCaixaVazia(CaixaDeEntrada *cx, int id) {
+    cx->primeiro = (Apontador_email)malloc(sizeof(Celula_email));
+    cx->ultimo = cx->primeiro;
+    cx->primeiro->Prox = NULL;
+    cx->Id = id;
 }
 
 // Verifica se a caixa esta ou não vazia
-int CaixaVazia(CaixaDeEntrada *Caixa) {
-    return (Caixa->primeiro == Caixa->ultimo);
+int CaixaVazia(CaixaDeEntrada *cx) {
+    return (cx->primeiro == cx->ultimo);
 }
 
 // Função que entrega email a uma caixa de entrada.
-void EntregaEmail(CaixaDeEntrada *Caixa, Mensagem msg) {
+void EntregaEmail(CaixaDeEntrada *cx, Mensagem msg) {
     Apontador_email aux1, aux2;
-    aux1 = Caixa->primeiro;
-    printf("%d\n", Caixa->Id);
+    aux1 = cx->primeiro;
     while (aux1->Prox != NULL && aux1->Prox->Item.Prioridade >= msg.Prioridade) {
-        printf("50\n");
         aux1 = aux1->Prox;
     }
     aux2 = aux1->Prox;
@@ -54,47 +31,44 @@ void EntregaEmail(CaixaDeEntrada *Caixa, Mensagem msg) {
     aux1->Prox->Prox = aux2;
     aux1->Prox->Item = msg;   
     if(aux2 == NULL){
-        Caixa->ultimo = aux1->Prox;
-    }     
+        cx->ultimo = aux1->Prox;
+    }   
+    printf("OK: MENSAGEM PARA %d ENTREGUE\n", cx->Id);
 }
 
-
-/*
-Função que consulta caixa de entrada. 
-Caso a caixa esteja vazia, retorna a mensagem "CAIXA DE ENTRADA VAZIA", caso
-contrário, imprime a primeira mensagem da caixa de entrada seguindo a ordem 
-de prioridade e em seguida apaga ela para que a próxima consulta realizada a 
-caixa de entrada imprima a próxima mensagem.
-*/
-void ConsultaEmail(CaixaDeEntrada *Caixa){
-    if(CaixaVazia(Caixa)){
+// Imprime a mensagem com maior prioridade da caixa e apaga ela.
+void ConsultaEmail(CaixaDeEntrada *cx){
+    if(CaixaVazia(cx)){
         printf("CAIXA DE ENTRADA VAZIA\n");
     }else{
-        printf("CONSULTA %d: %s\n",Caixa->Id, Caixa->primeiro->Prox->Item.Msg);
-        Apontador_email aux = Caixa->primeiro->Prox;
-        Caixa->primeiro->Prox = Caixa->primeiro->Prox->Prox;
+        printf("CONSULTA %d: %s\n",cx->Id, cx->primeiro->Prox->Item.Msg);
+        Apontador_email aux = cx->primeiro->Prox;
+        cx->primeiro->Prox = cx->primeiro->Prox->Prox;
+        if(cx->primeiro->Prox == NULL){
+            cx->ultimo = cx->primeiro;
+        }
         free(aux);
     }
 }
 
+// Apaga todas as mensagens da caixa de entrada.
+void LimpaCaixa(CaixaDeEntrada *cx){
+    Apontador_email aux;
+    aux = cx->primeiro->Prox;
+    while (aux != NULL){
+        cx->primeiro->Prox = cx->primeiro->Prox->Prox;
+        free(aux);
+        aux = cx->primeiro->Prox;
+    }
+    free(cx->primeiro);
+}
 
-// Lista encadeada simples com descritor para caixas de entrada
 
-// typedef struct Celula_caixa_str *Apontador_caixa;
+// ##########################################################################################
+//                            Operações sobre server
+// ##########################################################################################
 
-// typedef struct Celula_caixa_str {
-//     CaixaDeEntrada Item;
-//     Apontador_caixa Prox;
-// } Celula_caixa;
-
-// // Descritor:
-// typedef struct {
-//     Apontador_caixa primeiro, ultimo;
-// } Server;
-
-// Operações sobre a lista
-
-// Inicializa servidor
+// Inicializa servidor.
 void CriaServer(Server *sv) {
     sv->primeiro = (Apontador_caixa)malloc(sizeof(Celula_caixa));
     sv->ultimo = sv->primeiro;
@@ -102,7 +76,7 @@ void CriaServer(Server *sv) {
     printf("SERVER CRIADO\n");
 }
 
-// Direciona email para caixa certa
+// Direciona email para caixa certa.
 void EntregaMensagem(Server *sv, Mensagem msg, int id){
     Apontador_caixa aux;
     aux = sv->primeiro;
@@ -113,10 +87,10 @@ void EntregaMensagem(Server *sv, Mensagem msg, int id){
         }
         aux = aux->Prox;
     }
-    printf("%d\n%s\n", aux->Item.Id, msg.Msg);
     EntregaEmail(&(aux->Item), msg);
 }
 
+// Chama a função que cria uma caixa de entrada vazia e adiciona essa caixa ao servidor.
 void NovaCaixa(Server *sv, int id) {
     CaixaDeEntrada cx;
     Apontador_caixa aux;
@@ -136,12 +110,13 @@ void NovaCaixa(Server *sv, int id) {
     printf("ERRO: CONTA %d JÁ EXISTENTE\n", id);
 }
 
-
+// Procura a caixa de entrada no server e chama a função que imprime a mensagem de maior 
+// prioridade da caixa e apaga ela.
 void ConsultaID(Server *sv, int id){
     Apontador_caixa aux;
     aux = sv->primeiro;
     while (aux->Item.Id != id) {
-        if(aux == NULL) {
+        if(aux->Prox == NULL) {
             printf("ERRO: CONTA %d NÃO EXISTENTE\n", id);
             return;
         }
@@ -150,4 +125,23 @@ void ConsultaID(Server *sv, int id){
     ConsultaEmail(&(aux->Item));
 }
 
-
+// Chama a função que limpa a caixa de entrada e apaga ela em seguida.
+void RemoveID(Server *sv, int id){
+    Apontador_caixa aux1, aux2;
+    aux1 = sv->primeiro;
+    while (aux1->Prox != NULL){
+        if(aux1->Prox->Item.Id == id){
+            LimpaCaixa(&(aux1->Prox->Item));
+            aux2 = aux1->Prox->Prox;
+            free(aux1->Prox);
+            aux1->Prox = aux2;
+            if(aux2 == NULL){
+                sv->ultimo = aux1;
+            }
+            printf("OK: CONTA %d REMOVIDA\n", id);
+            return;
+        }
+        aux1 = aux1->Prox;
+    }
+    printf("ERRO: CONTA %d NÃO EXISTE\n", id);
+}

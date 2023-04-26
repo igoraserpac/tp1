@@ -5,19 +5,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Lista encadeada simples com descritor para emails
+// Lista encadeada simples com descritor para caixas de entrada
 
 // Struct para mensagens.
 typedef struct {
     short int Prioridade; // Nível de prioridade da mensagem.
-    char Msg[1000]; // String que contém a mensagem.
+    char Msg[1024]; // String que contém a mensagem.
 } Mensagem;
 
 // Define um "Apontador" como sendo um ponteiro para uma célula.
-typedef struct Celula_email_str *Apontador_email;
+typedef struct Celula_email_t *Apontador_email;
 
 // Struct para célula. Contém uma mensagem e um Apontador_email para a próxima célula.
-typedef struct Celula_email_str {
+typedef struct Celula_email_t {
     Mensagem Item;
     Apontador_email Prox;
 } Celula_email;
@@ -28,31 +28,25 @@ typedef struct {
     Apontador_email primeiro, ultimo;
 } CaixaDeEntrada;
 
-// Operações sobre a Lista:
+// Operações sobre a caixa de entrada:
 
-// Cria caixa de entrada vazia:
 void CriaCaixaVazia(CaixaDeEntrada *Caixa, int id);
-// Verifica se a caixa esta ou não vazia
+
 int CaixaVazia(CaixaDeEntrada *Caixa);
 
-// Função que entrega email a uma caixa de entrada.
 void EntregaEmail(CaixaDeEntrada *Caixa, Mensagem msg);
 
-/*
-Função que consulta caixa de entrada. 
-Caso a caixa esteja vazia, retorna a mensagem "CAIXA DE ENTRADA VAZIA", caso
-contrário, imprime a primeira mensagem da caixa de entrada seguindo a ordem 
-de prioridade e em seguida apaga ela para que a próxima consulta realizada a 
-caixa de entrada imprima a próxima mensagem.
-*/
 void ConsultaEmail(CaixaDeEntrada *Caixa);
 
+void LimpaCaixa(CaixaDeEntrada *cx);
 
 // Lista encadeada simples com descritor para caixas de entrada
 
-typedef struct Celula_caixa_str *Apontador_caixa;
+// Define um "Apontador" como sendo um ponteiro para uma célula.
+typedef struct Celula_caixa_t *Apontador_caixa;
 
-typedef struct Celula_caixa_str {
+// Struct para célula. Contém uma caixa de entrada e um Apontador_caixa para a próxima célula.
+typedef struct Celula_caixa_t {
     CaixaDeEntrada Item;
     Apontador_caixa Prox;
 } Celula_caixa;
@@ -62,21 +56,17 @@ typedef struct {
     Apontador_caixa primeiro, ultimo;
 } Server;
 
-// Operações sobre a lista
+// Operações sobre o server:
 
-// Inicializa servidor
 void CriaServer(Server *sv);
 
-// Direciona email para caixa certa
 void EntregaMensagem(Server *sv, Mensagem msg, int id);
-
 
 void NovaCaixa(Server *sv, int id);
 
-
 void ConsultaID(Server *sv, int id);
 
-
+void RemoveID(Server *sv, int id);
 
 
 #endif
