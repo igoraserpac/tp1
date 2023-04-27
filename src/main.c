@@ -1,31 +1,36 @@
-#include "../include/tads.h"
+#include "../include/server.h"
 #include <string.h>
 
-int main(){
+int main(int argc, char *argv[]){
     Server sv;
     CriaServer(&sv);
-    NovaCaixa(&sv, 5);
-    NovaCaixa(&sv, 6);
-    NovaCaixa(&sv, 7);
-    NovaCaixa(&sv, 8);
-    NovaCaixa(&sv, 6);
-
-    Mensagem msg;
-    strcpy(msg.Msg, "Olá Bom dia!");
-    msg.Prioridade = 8;
-    EntregaMensagem(&sv, msg, 5);
-    EntregaMensagem(&sv, msg, 6);
-    EntregaMensagem(&sv, msg, 7);
-    EntregaMensagem(&sv, msg, 8);
-    EntregaMensagem(&sv, msg, 5);
-    EntregaMensagem(&sv, msg, 5);
-    ConsultaID(&sv, 5);
-    ConsultaID(&sv, 5);
-    ConsultaID(&sv, 5);
-    ConsultaID(&sv, 5);
-    RemoveID(&sv, 5);
-    RemoveID(&sv, 6);
-    RemoveID(&sv, 7);
-    RemoveID(&sv, 8);
-    ConsultaID(&sv, 5);
+    if(argc < 2){
+        printf("ERRO: ARQUIVO DE ENTRADA NÃO ESPECIFICADO\n");
+        return 1;
+    }
+    FILE *file = fopen(argv[1], "r");
+    char comando[20], mensagem[1024];
+    int id, pri;
+    while (!feof(file)){
+        fscanf(file, "%s %d", comando, &id);
+        if(!strcmp(comando, "CADASTRA")){
+            NovaCaixa(&sv, id);
+            fscanf(file,"\n");
+        }else if(!strcmp(comando, "CONSULTA")){
+            ConsultaID(&sv, id);
+            fscanf(file,"\n");
+        }else if(!strcmp(comando, "REMOVE")){
+            RemoveID(&sv, id);
+            fscanf(file,"\n");
+        }else if(!strcmp(comando, "ENTREGA")){
+            fscanf(file, "%d", &pri);
+            fgets(mensagem, 1024, file);
+            mensagem[strlen(mensagem)-5] = '\0';
+            Mensagem msg;
+            strcpy(msg.Msg, mensagem);
+            msg.Prioridade = pri;
+            EntregaMensagem(&sv, msg, id);
+        }
+    }
+    free(sv.primeiro);
 }

@@ -13,7 +13,7 @@ INCDIR := include
 SRCDIR := src
 
 # Compiler flags
-CFLAGS := -Wall -I $(INCDIR)
+CFLAGS := -Wall -g -I $(INCDIR)
 
 # Linker flags
 LDFLAGS := 
