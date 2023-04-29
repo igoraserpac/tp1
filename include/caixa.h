@@ -29,13 +29,13 @@ typedef struct {
 
 // Operações sobre a caixa de entrada:
 
-void CriaCaixaVazia(CaixaDeEntrada *Caixa, int id);
+void CriaCaixaVazia(CaixaDeEntrada *cx, int id);
 
-int CaixaVazia(CaixaDeEntrada *Caixa);
+int CaixaVazia(CaixaDeEntrada *cx);
 
-void EntregaEmail(CaixaDeEntrada *Caixa, Mensagem msg);
+void EntregaEmail(CaixaDeEntrada *cx, Mensagem msg);
 
-void ConsultaEmail(CaixaDeEntrada *Caixa);
+void ConsultaEmail(CaixaDeEntrada *cx);
 
 void LimpaCaixa(CaixaDeEntrada *cx);
 
