@@ -1,0 +1,12 @@
+Instruções para compilação e execução do código:
+
+1- Depois de descompactar, abra um terminal na pasta do projeto.
+
+2- Rode o comando make.
+
+3- Copie o arquivo de entrada para a pasta do projeto.
+
+4- Execute o programa com o comando:
+    $ ./bin/out <arquivo de entrada>
+
+5- A saída do programa é a saída padrão.
